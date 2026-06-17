@@ -1,422 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-  <title>Elate Residences Pune – CP Contest</title>
-  <meta name="description" content="Discover premium 2 BHK residences at Elate, Undri Pune. Designed for comfort and privacy, with modern amenities that elevate everyday living." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --gold: #C9A96E;
-      --gold-light: #E8D5A3;
-      --gold-dark: #A07840;
-      --cream: #FAF7F2;
-      --dark: #1A1612;
-      --dark-mid: #2E2820;
-      --muted: #7A6E62;
-      --border: rgba(201,169,110,0.25);
-      --rank1: #C9A96E;
-      --rank2: #A8B8C8;
-      --rank3: #C4A882;
-      --rank4: #8BA89A;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--cream);
-      color: var(--dark);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-    }
-
-    /* ── HERO BANNER ── */
-    .hero {
-      width: 100%;
-      display: block;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* ── LEADERBOARD SECTION ── */
-    .leaderboard-section {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 60px 24px 48px;
-    }
-
-    .section-eyebrow {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 10px;
-    }
-
-    .section-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(32px, 5vw, 52px);
-      font-weight: 600;
-      color: var(--dark);
-      line-height: 1.1;
-      margin-bottom: 8px;
-    }
-
-    .section-sub {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 40px;
-    }
-
-    /* ── TABLE ── */
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: 2px;
-      border: 1px solid var(--border);
-      background: #fff;
-      box-shadow: 0 4px 40px rgba(26,22,18,0.06);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    thead tr {
-      background: var(--dark);
-    }
-
-    thead th {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--gold-light);
-      padding: 16px 24px;
-      text-align: left;
-    }
-
-    tbody tr {
-      border-bottom: 1px solid rgba(201,169,110,0.12);
-      transition: background 0.2s;
-    }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(201,169,110,0.04); }
-
-    tbody td {
-      padding: 18px 24px;
-      color: var(--dark);
-      font-weight: 300;
-    }
-
-    .rank-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--dark);
-    }
-    .rank-1 { background: var(--rank1); }
-    .rank-2 { background: var(--rank2); }
-    .rank-3 { background: var(--rank3); }
-    .rank-4 { background: var(--rank4); }
-    .rank-other { background: rgba(122,110,98,0.12); font-size: 14px; color: var(--muted); }
-
-    .org-name {
-      font-weight: 500;
-      color: var(--dark);
-    }
-
-    .stat {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px;
-      font-weight: 600;
-      color: var(--dark-mid);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 56px 24px;
-      color: var(--muted);
-    }
-    .empty-state .icon {
-      font-size: 36px;
-      margin-bottom: 12px;
-      opacity: 0.4;
-    }
-    .empty-state p {
-      font-size: 14px;
-    }
-
-    /* ── GOLD DIVIDER ── */
-    .gold-rule {
-      width: 64px;
-      height: 2px;
-      background: linear-gradient(90deg, var(--gold), transparent);
-      margin: 0 0 48px;
-    }
-
-    /* ── RULES SECTION ── */
-    .rules-section {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px 80px;
-    }
-
-    .rules-card {
-      background: var(--dark);
-      border-radius: 2px;
-      padding: 48px 56px;
-      position: relative;
-      overflow: hidden;
-    }
-    .rules-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
-    }
-
-    .rules-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(24px, 3.5vw, 36px);
-      font-weight: 600;
-      color: var(--gold-light);
-      margin-bottom: 32px;
-    }
-
-    .rules-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .rules-list li {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      font-size: 14px;
-      line-height: 1.7;
-      color: rgba(250,247,242,0.75);
-    }
-
-    .rules-list li::before {
-      content: '';
-      flex-shrink: 0;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--gold);
-      margin-top: 8px;
-    }
-
-    .rules-list strong {
-      color: var(--gold-light);
-      font-weight: 500;
-    }
-
-    .prize-highlight {
-      margin-top: 32px;
-      padding: 24px 28px;
-      background: rgba(201,169,110,0.08);
-      border-left: 3px solid var(--gold);
-      border-radius: 1px;
-    }
-
-    .prize-highlight p {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px;
-      color: var(--gold-light);
-      font-style: italic;
-    }
-
-    /* ── LAST UPDATED ── */
-    .last-updated {
-      text-align: right;
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.05em;
-      margin-top: 12px;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--dark-mid);
-      padding: 24px;
-      text-align: center;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      color: rgba(250,247,242,0.3);
-    }
-
-    @media (max-width: 600px) {
-      .rules-card { padding: 32px 24px; }
-      thead th, tbody td { padding: 14px 16px; }
-      .stat { font-size: 18px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shubh Tristar | CP & Lead Tracking Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- HERO -->
-  <div class="hero">
-    <img src="https://elateresidences.staging.digital.beyondwalls.com/assets/images/cp-contest-desk-banner1.webp" alt="Elate Residences CP Contest Banner" />
-  </div>
-
-  <!-- LEADERBOARD -->
-  <section class="leaderboard-section">
-    <div class="section-eyebrow">Live Standings · May – June 2026</div>
-    <h2 class="section-title">Top Performing<br><em>Channel Partners</em></h2>
-    <p class="section-sub">Rankings updated regularly throughout the contest period.</p>
-    <div class="gold-rule"></div>
-
-    <div class="table-wrap">
-      <table id="leaderboard-table">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Organisation</th>
-            <th>Site Visits</th>
-            <th>Bookings</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboard-body">
-          <!-- rows injected by JS -->
-        </tbody>
-      </table>
+<!-- ================= TOP BAR ================= -->
+<header class="topbar">
+  <div class="container topbar-inner">
+    <div class="brand">
+      <span class="brand-mark">ST</span>
+      <div class="brand-text">
+        <strong>Shubh Tristar</strong>
+        <small>Channel Partner Hub</small>
+      </div>
     </div>
-    <div class="last-updated" id="last-updated"></div>
-  </section>
+    <nav class="topnav">
+      <button id="navHomeBtn" class="nav-link is-active" type="button">Home</button>
+      <button id="navAdminBtn" class="nav-link" type="button" hidden>Admin Console</button>
+      <button id="loginBtn" class="btn btn-outline-gold" type="button">Admin Login</button>
+      <button id="logoutBtn" class="btn btn-ghost" type="button" hidden>Logout</button>
+    </nav>
+  </div>
+</header>
 
-  <!-- RULES -->
-  <section class="rules-section">
-    <div class="rules-card">
-      <h3 class="rules-title">Rules &amp; Regulations</h3>
-      <ul class="rules-list">
-        <li>The CP Contest will run for a period of <strong>2 months,</strong> starting from <strong>1st May 2026 to 30th June 2026.</strong></li>
-        <li>A <strong>Live Leaderboard Dashboard</strong> will be maintained and updated regularly throughout the contest duration to track the performance of participating Channel Partner firms.</li>
-        <li>A minimum of <strong>7 confirmed bookings within the contest period</strong> is mandatory for a Channel Partner firm to qualify for the contest reward.</li>
-        <li><strong>Top 4 performing Channel Partner firms</strong> (based on total confirmed bookings) will be eligible for the contest reward.</li>
-        <li>In the event of a tie in booking counts, the Channel Partner firm with the <strong>higher number of site visits generated</strong> during the contest period will be declared the winner.</li>
-        <li>Only <strong>confirmed and valid bookings</strong> done within the contest duration will be considered eligible.</li>
-        <li>Bookings that are <strong>cancelled, refunded, or not realized</strong> during the contest period will not be counted towards the final tally.</li>
-        <li>All bookings will be <strong>verified and validated internally</strong> before finalizing the winners.</li>
-        <li>The reward is <strong>non-transferable and cannot be exchanged for cash or any other benefit.</strong></li>
-        <li>The <strong>travel itinerary, dates, and arrangements</strong> for the reward will be decided by the management and communicated to the winners.</li>
-        <li>Any <strong>discrepancy, dispute, or malpractice</strong> identified during the contest period may lead to disqualification at the sole discretion of the management.</li>
-        <li>The decision of the management will be <strong>final and binding</strong> in all scenarios related to the contest.</li>
-      </ul>
+<!-- ================= PUBLIC HOME (CP HUB) ================= -->
+<main id="publicView" class="view is-active">
 
-      <div class="prize-highlight">
-        <p>🏆 Prize: Fully Sponsored Goa Trip for 2 Days &nbsp;·&nbsp; 2 members from each of the Top 4 CP Firms</p>
+  <section class="hero">
+    <div class="container hero-inner">
+      <p class="eyebrow">Shubh Tristar &mdash; Premium Skyvilla Residences</p>
+      <h1>Channel Partner Rewards Program</h1>
+      <p class="hero-sub">Bring qualified buyers, close premium bookings, and earn industry-leading brokerage on every Skyvilla sold.</p>
+
+      <div class="offer-grid">
+        <article class="offer-card">
+          <span class="offer-tag">Slab 01</span>
+          <p class="offer-value">4%<small>Brokerage</small></p>
+          <p class="offer-copy">On cumulative sale value above <strong>&#8377;35 Cr</strong></p>
+        </article>
+        <article class="offer-card offer-card--gold">
+          <span class="offer-tag">Slab 02</span>
+          <p class="offer-value">5%<small>Brokerage</small></p>
+          <p class="offer-copy">On cumulative sale value above <strong>&#8377;50 Cr</strong></p>
+        </article>
       </div>
     </div>
   </section>
 
-  <footer>
-    &copy; 2026 Elate Residences · Undri, Pune · All Rights Reserved
+  <section class="container entry-section">
+    <div class="section-head">
+      <h2>Register a Site Visit</h2>
+      <p>Submit your customer's details below to start tracking their journey toward a booking.</p>
+    </div>
+
+    <form id="leadForm" class="card lead-form" novalidate>
+      <div class="form-grid">
+        <div class="field">
+          <label for="custName">Customer Name</label>
+          <input id="custName" name="custName" type="text" placeholder="e.g. Rohan Kapoor" required>
+        </div>
+        <div class="field">
+          <label for="custPhone">Customer Phone Number</label>
+          <input id="custPhone" name="custPhone" type="tel" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+        </div>
+        <div class="field">
+          <label for="config">Selected Configuration</label>
+          <select id="config" name="config" required>
+            <option value="" disabled selected>Choose configuration</option>
+            <option value="3 BHK Skyvilla">3 BHK Skyvilla</option>
+            <option value="4 BHK Skyvilla">4 BHK Skyvilla</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="cpName">Sourcing CP Name</label>
+          <input id="cpName" name="cpName" type="text" placeholder="e.g. Prestige Realty Partners" required>
+        </div>
+        <div class="field field--wide">
+          <label for="visitDate">Visit Date &amp; Time</label>
+          <input id="visitDate" name="visitDate" type="datetime-local" required>
+        </div>
+      </div>
+      <button class="btn btn-gold btn-block" type="submit">Submit Visit Entry</button>
+      <p id="formMsg" class="form-msg" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <footer class="footer">
+    <div class="container">&copy; <span id="year"></span> Shubh Tristar. Channel Partner Hub &mdash; Internal Use Only.</div>
   </footer>
+</main>
 
-  <script>
-    const STORAGE_KEY = 'elate_cp_leaderboard';
+<!-- ================= ADMIN CONSOLE ================= -->
+<main id="adminView" class="view">
+  <section class="container admin-wrap">
+    <div class="section-head">
+      <h2>Admin Console</h2>
+      <p>Live overview of leads, visit status, bookings and CP commissions.</p>
+    </div>
 
-    function getRankClass(rank) {
-      if (rank <= 4) return `rank-${rank}`;
-      return 'rank-other';
-    }
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Leads</span>
+        <span class="stat-value" id="statLeads">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Bookings</span>
+        <span class="stat-value" id="statBookings">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Booked Sale Value</span>
+        <span class="stat-value" id="statSales">&#8377;0 Cr</span>
+      </div>
+      <div class="stat-card stat-card--gold">
+        <span class="stat-label">Commission Payable</span>
+        <span class="stat-value" id="statCommission">&#8377;0 Cr</span>
+      </div>
+    </div>
 
-    function renderLeaderboard() {
-      const tbody = document.getElementById('leaderboard-body');
-      const lastUpdatedEl = document.getElementById('last-updated');
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Lead Management</h3>
+        <span class="badge" id="leadCount">0 leads</span>
+      </div>
+      <div class="table-wrap">
+        <table class="lead-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Configuration</th>
+              <th>Sourcing CP</th>
+              <th>Visit Date</th>
+              <th>Visit Status</th>
+              <th>Sale Value (Cr)</th>
+            </tr>
+          </thead>
+          <tbody id="leadTableBody"></tbody>
+        </table>
+        <p id="emptyState" class="empty-state" hidden>No leads yet. Entries submitted from the Home page will appear here.</p>
+      </div>
+    </div>
 
-      let raw = null;
-      try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) {}
+    <div class="panel">
+      <div class="panel-head">
+        <h3>CP Leaderboard &amp; Commission Tracker</h3>
+      </div>
+      <div id="leaderboardGrid" class="leaderboard-grid"></div>
+    </div>
+  </section>
+</main>
 
-      let data = [];
-      let lastUpdated = null;
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          data = parsed.entries || [];
-          lastUpdated = parsed.updatedAt || null;
-        } catch(e) {}
-      }
+<!-- ================= LOGIN MODAL ================= -->
+<div id="loginModal" class="modal-overlay" hidden>
+  <div class="card modal">
+    <button id="closeLoginBtn" class="modal-close" type="button" aria-label="Close">&times;</button>
+    <h3>Admin Login</h3>
+    <p class="modal-sub">Restricted access &mdash; Shubh Tristar staff only.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginUser">Username</label>
+        <input id="loginUser" type="text" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="loginPass">Password</label>
+        <input id="loginPass" type="password" autocomplete="current-password" required>
+      </div>
+      <p id="loginError" class="error-text" aria-live="polite"></p>
+      <button class="btn btn-gold btn-block" type="submit">Login</button>
+    </form>
+    <p class="hint">Demo credentials: <strong>admin</strong> / <strong>admin123</strong></p>
+  </div>
+</div>
 
-      // Sort by bookings desc, then visits desc
-      data.sort((a, b) => {
-        if (b.bookings !== a.bookings) return b.bookings - a.bookings;
-        return b.visits - a.visits;
-      });
+<!-- ================= TOAST ================= -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-      tbody.innerHTML = '';
-
-      if (data.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="4">
-              <div class="empty-state">
-                <div class="icon">🏆</div>
-                <p>Leaderboard will be updated shortly. Check back soon!</p>
-              </div>
-            </td>
-          </tr>`;
-        lastUpdatedEl.textContent = '';
-        return;
-      }
-
-      data.forEach((cp, i) => {
-        const rank = i + 1;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><span class="rank-badge ${getRankClass(rank)}">${rank}</span></td>
-          <td class="org-name">${escapeHtml(cp.org)}</td>
-          <td><span class="stat">${Number(cp.visits).toLocaleString()}</span></td>
-          <td><span class="stat">${Number(cp.bookings).toLocaleString()}</span></td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      if (lastUpdated) {
-        const d = new Date(lastUpdated);
-        lastUpdatedEl.textContent = `Last updated: ${d.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
-      }
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    // Initial render
-    renderLeaderboard();
-
-    // Live sync: listen for storage changes from dashboard (same origin, other tab)
-    window.addEventListener('storage', (e) => {
-      if (e.key === STORAGE_KEY) renderLeaderboard();
-    });
-
-    // Poll every 30s for same-tab updates
-    setInterval(renderLeaderboard, 30000);
-  </script>
+<script src="app.js"></script>
 </body>
 </html>
