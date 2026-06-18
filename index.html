@@ -32,28 +32,58 @@
 <!-- ================= PUBLIC HOME (CP HUB) ================= -->
 <main id="publicView" class="view is-active">
 
+  <!-- Hero: offers on the left, target-completion chart on the right -->
   <section class="hero">
-    <div class="container hero-inner">
-      <p class="eyebrow">Shubh Tristar &mdash; Premium Skyvilla Residences</p>
-      <h1>PROP Channel Partner Brokerage Program</h1>
-      <p class="hero-sub">Every PROP CP shares in Shubh Tristar's success. Brokerage slabs unlock as the project's total cumulative sales grow &mdash; the reward is for PROP's combined performance, not any single CP.</p>
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <p class="eyebrow">Shubh Tristar &mdash; Premium Skyvilla Residences</p>
+        <h1>PROP Channel Partner Brokerage Program</h1>
+        <p class="hero-sub">Every PROP CP shares in Shubh Tristar's success. Brokerage slabs unlock as the project's total cumulative sales grow &mdash; the reward is for PROP's combined performance, not any single CP.</p>
 
-      <div class="offer-grid">
-        <article class="offer-card">
-          <span class="offer-tag">Slab 01</span>
-          <p class="offer-value">4%<small>Brokerage</small></p>
-          <p class="offer-copy">When PROP's cumulative sale value crosses <strong>&#8377;35 Cr</strong></p>
-        </article>
-        <article class="offer-card offer-card--gold">
-          <span class="offer-tag">Slab 02</span>
-          <p class="offer-value">5%<small>Brokerage</small></p>
-          <p class="offer-copy">When PROP's cumulative sale value crosses <strong>&#8377;50 Cr</strong></p>
-        </article>
+        <div class="offer-grid offer-grid--stacked">
+          <article class="offer-card">
+            <span class="offer-tag">Slab 01</span>
+            <p class="offer-value">4%<small>Brokerage</small></p>
+            <p class="offer-copy">When PROP's cumulative sale value crosses <strong>&#8377;35 Cr</strong> &mdash; equivalent to <strong>17 Flats</strong></p>
+          </article>
+          <article class="offer-card offer-card--gold">
+            <span class="offer-tag">Slab 02</span>
+            <p class="offer-value">5%<small>Brokerage</small></p>
+            <p class="offer-copy">When PROP's cumulative sale value crosses <strong>&#8377;50 Cr</strong> &mdash; equivalent to <strong>24 Flats</strong></p>
+          </article>
+        </div>
+        <p class="offer-note">Slabs are calculated on Shubh Tristar's total cumulative PROP sales across all Channel Partners combined &mdash; not on any individual CP's personal sales.</p>
       </div>
-      <p class="offer-note">Slabs are calculated on Shubh Tristar's total cumulative PROP sales across all Channel Partners combined &mdash; not on any individual CP's personal sales.</p>
+
+      <div class="hero-chart">
+        <div class="card chart-card">
+          <p class="chart-title">PROP Target Completed</p>
+          <div class="donut-wrap">
+            <div class="donut" id="targetDonut"></div>
+            <div class="donut-hole"></div>
+            <div class="donut-center">
+              <span class="donut-pct" id="donutPct">0%</span>
+              <span class="donut-label">of &#8377;50 Cr Goal</span>
+            </div>
+          </div>
+          <ul class="donut-legend">
+            <li><span class="dot dot-gold"></span>Achieved</li>
+            <li><span class="dot dot-gray"></span>Remaining</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </section>
 
+  <!-- Daily motivation strip for CPs -->
+  <section class="motivation-strip">
+    <div class="container motivation-inner">
+      <span class="motivation-icon">&#10022;</span>
+      <p id="motivationText">Loading today's motivation&hellip;</p>
+    </div>
+  </section>
+
+  <!-- Cumulative PROP sales -->
   <section class="container cumulative-section">
     <div class="card cumulative-card">
       <div class="cumulative-top">
@@ -67,11 +97,52 @@
       <div class="slab-meter-wrap">
         <div class="slab-meter">
           <div class="slab-meter-fill" id="homeCumFill"></div>
-          <div class="slab-meter-tick" id="homeTick35" data-label="35 Cr"></div>
-          <div class="slab-meter-tick" id="homeTick50" data-label="50 Cr"></div>
+          <div class="slab-meter-tick" id="homeTick35"></div>
+          <div class="slab-meter-tick" id="homeTick50"></div>
         </div>
       </div>
       <p class="cumulative-note">This figure totals every <strong>Booked</strong> sale recorded for PROP CPs on Shubh Tristar, and decides the brokerage slab applicable project-wide.</p>
+    </div>
+  </section>
+
+  <!-- Highlights: latest booking + top performing CPs -->
+  <section class="container highlights-section">
+    <div class="highlights-grid">
+      <div class="card highlight-card">
+        <span class="highlight-tag">&#127942; Latest Booking</span>
+        <p class="latest-cp-name" id="latestBookingCP">&mdash;</p>
+        <p class="latest-booking-meta" id="latestBookingMeta">No bookings yet.</p>
+      </div>
+      <div class="card highlight-card">
+        <span class="highlight-tag">&#11088; Top Performing PROP CPs</span>
+        <ol class="top-cp-list" id="topCpList"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Basic public analytics -->
+  <section class="container analytics-section">
+    <div class="section-head">
+      <h2>PROP Performance Snapshot</h2>
+      <p>A quick look at how the program is tracking so far.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Leads</span>
+        <span class="stat-value" id="pubStatLeads">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Bookings</span>
+        <span class="stat-value" id="pubStatBookings">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Flats Sold</span>
+        <span class="stat-value" id="pubStatFlats">0</span>
+      </div>
+      <div class="stat-card stat-card--gold">
+        <span class="stat-label">Conversion Rate</span>
+        <span class="stat-value" id="pubStatConversion">0%</span>
+      </div>
     </div>
   </section>
 
@@ -83,9 +154,12 @@
 <!-- ================= ADMIN CONSOLE ================= -->
 <main id="adminView" class="view">
   <section class="container admin-wrap">
-    <div class="section-head">
-      <h2>Admin Console</h2>
-      <p>Log PROP CP site visits, tag statuses, record bookings, and track commissions.</p>
+    <div class="admin-top-row">
+      <div class="section-head section-head--left">
+        <h2>Admin Console</h2>
+        <p>Log PROP CP site visits, tag statuses, record bookings, and track commissions.</p>
+      </div>
+      <button id="exportExcelBtn" class="btn btn-gold" type="button">&#11015; Export as Excel</button>
     </div>
 
     <div class="stat-grid">
@@ -175,6 +249,22 @@
       <p class="leaderboard-note">Commission per CP = their own booked sales &times; the current PROP-wide brokerage slab shown above.</p>
       <div id="leaderboardGrid" class="leaderboard-grid"></div>
     </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Detailed Analytics</h3>
+      </div>
+      <div class="analytics-detail-grid">
+        <div class="analytics-block">
+          <h4>Visit Status Breakdown</h4>
+          <div id="statusBreakdown" class="breakdown-list"></div>
+        </div>
+        <div class="analytics-block">
+          <h4>Configuration Performance</h4>
+          <div id="configBreakdown" class="breakdown-list"></div>
+        </div>
+      </div>
+    </div>
   </section>
 </main>
 
@@ -203,6 +293,8 @@
 <!-- ================= TOAST ================= -->
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<!-- SheetJS, used only by the Admin Console's Export as Excel button -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

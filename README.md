@@ -10,7 +10,7 @@ A premium, vanilla HTML/CSS/JS dashboard for managing PROP Channel Partner (CP) 
 | `styles.css` | Premium navy/gold theme, layout, responsive rules |
 | `app.js` | All state, business logic, rendering, and `localStorage` persistence |
 
-No build tools, frameworks, or dependencies. Just open `index.html` in a browser.
+No build tools or frameworks. The only external dependency is [SheetJS](https://sheetjs.com) (`xlsx.full.min.js`), loaded from its CDN purely to power the Admin Console's **Export as Excel** button — everything else is plain JS.
 
 ## Hosting on GitHub Pages
 
@@ -26,36 +26,35 @@ Username: admin
 Password: admin123
 ```
 
-This is a front-end simulation only (credentials live in `app.js`). It is **not** secure for real production use — for a live deployment, replace this with a real backend/auth provider.
+Front-end simulation only (credentials live in `app.js`) — **not** secure for real production use. For a live deployment, replace this with a real backend/auth provider.
 
-## How It Works
+## What's on the Home Page (Public)
 
-### 1. Public Home Page
-Open to everyone, no login required. Shows:
-- The PROP brokerage offer banner (4% / 5% slabs).
-- A **Cumulative PROP Sales** widget — a live, public-facing total of every booked sale recorded across all PROP CPs, with a badge showing the brokerage slab currently active project-wide, and a meter marking the ₹35 Cr / ₹50 Cr thresholds.
+- **Hero, two columns** — brokerage offers (4% / 5%) on the left, with each slab labelled by its flat-count equivalent (₹35 Cr → 17 Flats, ₹50 Cr → 24 Flats). On the right, a donut chart shows the percentage of the ₹50 Cr target completed so far. No per-unit/carpet pricing is shown or referenced anywhere in the app.
+- **Daily motivation strip** — a short, encouraging line for CPs that automatically rotates once every day (picked deterministically from the current date, so it's stable all day and changes the next day).
+- **Cumulative PROP Sales card** — the live total of every `Booked` sale across all CPs, the currently active brokerage slab badge, and a progress meter marked at the 17-flat and 24-flat milestones.
+- **Highlights** — the PROP CP firm behind the most recent booking (by the actual time it was marked Booked, not the visit date), and a top-3 leaderboard of the best-performing CPs by total sales.
+- **PROP Performance Snapshot** — basic public analytics: total leads, total bookings, flats sold, and conversion rate.
 
-There is **no entry form on the public page**. Site visits are logged only by Admin, inside the Admin Console.
+## Admin Console (after login)
 
-### 2. Admin Console
-Hidden until login. Once authenticated (`admin` / `admin123`), the "Admin Console" nav link appears and unlocks:
-- **Register New PROP CP Visit** — the customer entry form (Customer Name, Phone, Configuration, PROP CP Name, Visit Date & Time). This is now an admin-only action.
-- **Stat cards** — total leads, total bookings, cumulative PROP sales, total commission payable.
-- **Lead Management table** — every submitted entry, with an editable **Visit Status** dropdown (`Visit Scheduled`, `Visit Conducted`, `Follow-up`, `Not Interested`, `Booked`).
-- **Sale Value input** — enabled only when a lead's status is set to `Booked`. Entering a value (in Cr) records that booking's revenue.
-- **PROP CP Leaderboard** — per-CP breakdown of leads, bookings, own sales, share of total PROP sales, and commission earned.
+- **Export as Excel** — one click downloads a `.xlsx` workbook with three sheets: `PROP Summary` (top-line figures), `Leads` (every entry with status/sale value/booked date), and `CP Leaderboard` (per-CP totals and commission).
+- **Register New PROP CP Visit** — the customer entry form (moved here from the public page; only Admin can log new visits).
+- **Stat cards, Lead Management table, PROP CP Leaderboard** — as before, with status tagging and sale-value capture.
+- **Detailed Analytics** — a visit-status breakdown (with proportion bars) and a configuration-wise performance split (3 BHK vs 4 BHK Skyvilla: leads, bookings, revenue).
 
-### 3. Brokerage / Slab Calculation Logic — PROP-wide, not per CP
-This is the core business rule: **the offer belongs to PROP (the project), not to any individual CP.**
+## Brokerage / Slab Calculation Logic — PROP-wide, not per CP
+
+The core business rule: **the offer belongs to PROP (the project), not to any individual CP.**
 
 1. The app sums the `saleValue` of every lead across **every CP combined** whose status is `Booked`. This is the single **cumulative PROP sales** figure shown on the home page and in the Admin Console.
 2. That one project-wide figure decides the **one slab** that applies to everyone:
 
-   | Cumulative PROP Sales | Brokerage Slab |
-   |---|---|
-   | < ₹35 Cr | Not Qualified (0%) |
-   | ≥ ₹35 Cr | 4% |
-   | ≥ ₹50 Cr | 5% |
+   | Cumulative PROP Sales | Flats Equivalent | Brokerage Slab |
+   |---|---|---|
+   | < ₹35 Cr | < 17 Flats | Not Qualified (0%) |
+   | ≥ ₹35 Cr | ≥ 17 Flats | 4% |
+   | ≥ ₹50 Cr | ≥ 24 Flats | 5% |
 
 3. Each CP still earns commission only on **their own** booked sales, but always at the **current PROP-wide rate**:
 
@@ -67,17 +66,21 @@ This is the core business rule: **the offer belongs to PROP (the project), not t
 
    So if PROP's combined sales cross ₹50 Cr, every CP's commission jumps to 5% on their own bookings — even a CP whose own sales are small benefits once PROP as a whole crosses a threshold.
 
-This logic lives in `getSlab()`, `getPropTotalSales()`, and `getCPStats()` in `app.js`. The leaderboard panel header also shows a single slab badge (the current PROP-wide rate), and each CP card shows a contribution bar (their % share of total PROP sales) instead of an individual slab — there is no per-CP slab anymore.
+The flat-count figures (17 and 24) are fixed business inputs supplied for the two revenue thresholds; the app does not store, display, or derive any per-unit/carpet pricing — "Flats Sold" on the dashboard is simply a count of leads marked `Booked` (one booking = one flat), so no pricing assumption is ever needed or shown.
 
-### 4. State & Persistence
-- All leads are stored under `localStorage` key `st_cp_leads_v1` as a JSON array.
+This logic lives in `getSlab()`, `getPropTotalSales()`, and `getCPStats()` in `app.js`.
+
+## State & Persistence
+
+- All leads are stored under `localStorage` key `st_cp_leads_v1` as a JSON array, including a `bookedAt` timestamp captured the moment a lead is marked `Booked` (used to determine the "Latest Booking" highlight).
 - The app seeds 4 realistic mock entries on first load (two already booked, two still in the pipeline), so the dashboard never looks empty.
-- Admin login state is stored in `sessionStorage` (`st_admin_session_v1`), so it persists across refreshes within the same browser tab/session but resets when the tab/browser is closed.
-- Every mutation (new lead, status change, sale value entry) immediately writes back to `localStorage`, and the public Cumulative PROP Sales widget reflects it instantly — a refresh never loses data.
+- Admin login state is stored in `sessionStorage` (`st_admin_session_v1`) — persists across refreshes within the same tab/session, resets when the tab/browser closes.
+- Every mutation (new lead, status change, sale value entry) immediately writes back to `localStorage`, and every public widget (donut, cumulative card, highlights, snapshot) reflects it instantly — a refresh never loses data.
 
 ## Customization
 
-- **Colors / fonts** — all defined as CSS variables at the top of `styles.css` (`--navy-900`, `--gold`, `--font-display`, `--font-body`, etc.).
-- **Slab thresholds/rates** — change `SLAB1_THRESHOLD`, `SLAB2_THRESHOLD`, `SLAB1_RATE`, `SLAB2_RATE` constants at the top of `app.js`.
-- **Status options** — edit the `STATUS_OPTIONS` array in `app.js`; the corresponding color styling can be added in `styles.css` under `.status-select[data-status="..."]`.
-- **Reset demo data** — open browser DevTools console and run `localStorage.removeItem('st_cp_leads_v1')`, then refresh.
+- **Colors / fonts** — CSS variables at the top of `styles.css` (`--navy-900`, `--gold`, `--font-display`, `--font-body`, etc.).
+- **Slab thresholds/rates/flat targets** — `SLAB1_THRESHOLD`, `SLAB2_THRESHOLD`, `SLAB1_FLATS`, `SLAB2_FLATS`, `SLAB1_RATE`, `SLAB2_RATE` constants at the top of `app.js`.
+- **Motivation quotes** — edit the `MOTIVATION_QUOTES` array in `app.js`; it rotates by calendar day automatically.
+- **Status options** — edit `STATUS_OPTIONS`; matching color styling lives in `styles.css` under `.status-select[data-status="..."]`.
+- **Reset demo data** — open DevTools console and run `localStorage.removeItem('st_cp_leads_v1')`, then refresh.
