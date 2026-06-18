@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shubh Tristar | CP & Lead Tracking Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<header class="topbar">
+  <div class="container topbar-inner">
+    <div class="brand">
+      <span class="brand-mark">ST</span>
+      <div class="brand-text">
+        <strong>Shubh Tristar</strong>
+        <small>PROP Channel Partner Hub</small>
+      </div>
+    </div>
+    <nav class="topnav">
+      <button id="navHomeBtn" class="nav-link is-active" type="button">Home</button>
+      <button id="navAdminBtn" class="nav-link" type="button" hidden>Admin Console</button>
+      <button id="loginBtn" class="btn btn-outline-gold" type="button">Admin Login</button>
+      <button id="logoutBtn" class="btn btn-ghost" type="button" hidden>Logout</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= PUBLIC HOME (CP HUB) ================= -->
+<main id="publicView" class="view is-active">
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <p class="eyebrow">Shubh Tristar &mdash; Premium Skyvilla Residences</p>
+      <h1>PROP Channel Partner Brokerage Program</h1>
+      <p class="hero-sub">Every PROP CP shares in Shubh Tristar's success. Brokerage slabs unlock as the project's total cumulative sales grow &mdash; the reward is for PROP's combined performance, not any single CP.</p>
+
+      <div class="offer-grid">
+        <article class="offer-card">
+          <span class="offer-tag">Slab 01</span>
+          <p class="offer-value">4%<small>Brokerage</small></p>
+          <p class="offer-copy">When PROP's cumulative sale value crosses <strong>&#8377;35 Cr</strong></p>
+        </article>
+        <article class="offer-card offer-card--gold">
+          <span class="offer-tag">Slab 02</span>
+          <p class="offer-value">5%<small>Brokerage</small></p>
+          <p class="offer-copy">When PROP's cumulative sale value crosses <strong>&#8377;50 Cr</strong></p>
+        </article>
+      </div>
+      <p class="offer-note">Slabs are calculated on Shubh Tristar's total cumulative PROP sales across all Channel Partners combined &mdash; not on any individual CP's personal sales.</p>
+    </div>
+  </section>
+
+  <section class="container cumulative-section">
+    <div class="card cumulative-card">
+      <div class="cumulative-top">
+        <div>
+          <span class="eyebrow eyebrow-dark">PROP Performance, Live</span>
+          <h2>Cumulative PROP Sales</h2>
+        </div>
+        <span class="slab-badge slab-badge--0" id="homeCumBadge">Not Qualified</span>
+      </div>
+      <p class="cumulative-value" id="homeCumValue">&#8377;0.0 Cr</p>
+      <div class="slab-meter-wrap">
+        <div class="slab-meter">
+          <div class="slab-meter-fill" id="homeCumFill"></div>
+          <div class="slab-meter-tick" id="homeTick35" data-label="35 Cr"></div>
+          <div class="slab-meter-tick" id="homeTick50" data-label="50 Cr"></div>
+        </div>
+      </div>
+      <p class="cumulative-note">This figure totals every <strong>Booked</strong> sale recorded for PROP CPs on Shubh Tristar, and decides the brokerage slab applicable project-wide.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">&copy; <span id="year"></span> Shubh Tristar. PROP Channel Partner Hub &mdash; Internal Use Only.</div>
+  </footer>
+</main>
+
+<!-- ================= ADMIN CONSOLE ================= -->
+<main id="adminView" class="view">
+  <section class="container admin-wrap">
+    <div class="section-head">
+      <h2>Admin Console</h2>
+      <p>Log PROP CP site visits, tag statuses, record bookings, and track commissions.</p>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Leads</span>
+        <span class="stat-value" id="statLeads">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Bookings</span>
+        <span class="stat-value" id="statBookings">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Cumulative PROP Sales</span>
+        <span class="stat-value" id="statSales">&#8377;0 Cr</span>
+      </div>
+      <div class="stat-card stat-card--gold">
+        <span class="stat-label">PROP Commission Payable</span>
+        <span class="stat-value" id="statCommission">&#8377;0 Cr</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Register New PROP CP Visit</h3>
+      </div>
+      <form id="leadForm" class="lead-form-panel" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="custName">Customer Name</label>
+            <input id="custName" name="custName" type="text" placeholder="e.g. Rohan Kapoor" required>
+          </div>
+          <div class="field">
+            <label for="custPhone">Customer Phone Number</label>
+            <input id="custPhone" name="custPhone" type="tel" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+          </div>
+          <div class="field">
+            <label for="config">Selected Configuration</label>
+            <select id="config" name="config" required>
+              <option value="" disabled selected>Choose configuration</option>
+              <option value="3 BHK Skyvilla">3 BHK Skyvilla</option>
+              <option value="4 BHK Skyvilla">4 BHK Skyvilla</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="cpName">PROP CP Name</label>
+            <input id="cpName" name="cpName" type="text" placeholder="e.g. Prestige Realty Partners" required>
+          </div>
+          <div class="field field--wide">
+            <label for="visitDate">Visit Date &amp; Time</label>
+            <input id="visitDate" name="visitDate" type="datetime-local" required>
+          </div>
+        </div>
+        <button class="btn btn-gold" type="submit">Submit Visit Entry</button>
+        <p id="formMsg" class="form-msg" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Lead Management</h3>
+        <span class="badge" id="leadCount">0 leads</span>
+      </div>
+      <div class="table-wrap">
+        <table class="lead-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Configuration</th>
+              <th>PROP CP</th>
+              <th>Visit Date</th>
+              <th>Visit Status</th>
+              <th>Sale Value (Cr)</th>
+            </tr>
+          </thead>
+          <tbody id="leadTableBody"></tbody>
+        </table>
+        <p id="emptyState" class="empty-state" hidden>No leads yet. Use the form above to register a PROP CP site visit.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>PROP CP Leaderboard &amp; Commission Tracker</h3>
+        <span class="slab-badge slab-badge--0" id="leaderboardSlabBadge">Not Qualified</span>
+      </div>
+      <p class="leaderboard-note">Commission per CP = their own booked sales &times; the current PROP-wide brokerage slab shown above.</p>
+      <div id="leaderboardGrid" class="leaderboard-grid"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= LOGIN MODAL ================= -->
+<div id="loginModal" class="modal-overlay" hidden>
+  <div class="card modal">
+    <button id="closeLoginBtn" class="modal-close" type="button" aria-label="Close">&times;</button>
+    <h3>Admin Login</h3>
+    <p class="modal-sub">Restricted access &mdash; Shubh Tristar staff only.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginUser">Username</label>
+        <input id="loginUser" type="text" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="loginPass">Password</label>
+        <input id="loginPass" type="password" autocomplete="current-password" required>
+      </div>
+      <p id="loginError" class="error-text" aria-live="polite"></p>
+      <button class="btn btn-gold btn-block" type="submit">Login</button>
+    </form>
+    <p class="hint">Demo credentials: <strong>admin</strong> / <strong>admin123</strong></p>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
