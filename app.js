@@ -9,9 +9,9 @@
    their own booked sales, but the RATE applied is the single PROP-wide
    slab unlocked by the project's combined performance.
 
-   Flat-count targets (17 / 24 flats) are fixed business figures supplied
-   by Shubh Tristar — no per-unit pricing is stored, shown, or derived
-   anywhere in this app.
+   Flats vs. revenue: PROP's revenue targets (₹35 Cr / ₹50 Cr) are also
+   expressed as flat-count milestones (17 / 24 flats) so CPs can track
+   progress without any per-unit pricing ever being displayed.
    ========================================================================== */
 (function () {
   'use strict';
@@ -21,28 +21,28 @@
   var SESSION_KEY = 'st_admin_session_v1';
   var ADMIN_USER = 'admin';
   var ADMIN_PASS = 'admin123';
-  var SLAB1_THRESHOLD = 35; // Cr — PROP cumulative
-  var SLAB2_THRESHOLD = 50; // Cr — PROP cumulative
-  var SLAB1_FLATS = 17;     // Flats equivalent to Slab 1 target
-  var SLAB2_FLATS = 24;     // Flats equivalent to Slab 2 target
+  var SLAB1_THRESHOLD = 35;   // Cr — PROP cumulative
+  var SLAB2_THRESHOLD = 50;   // Cr — PROP cumulative
   var SLAB1_RATE = 0.04;
   var SLAB2_RATE = 0.05;
+  var FLATS_TARGET_1 = 17;    // flats equivalent to ₹35 Cr
+  var FLATS_TARGET_2 = 24;    // flats equivalent to ₹50 Cr
   var STATUS_OPTIONS = ['Visit Scheduled', 'Visit Conducted', 'Follow-up', 'Not Interested', 'Booked'];
   var CONFIG_OPTIONS = ['3 BHK Skyvilla', '4 BHK Skyvilla'];
+  var DONUT_R = 68;
+  var DONUT_CIRC = 2 * Math.PI * DONUT_R;
 
   var MOTIVATION_QUOTES = [
-    "Every site visit is a step closer to a milestone — keep the momentum going!",
-    "Great CPs don't wait for leads, they create opportunities.",
-    "One more booking today could unlock the next brokerage slab for everyone.",
-    "Your hustle today is tomorrow's closed deal.",
-    "Consistency closes more deals than talent alone.",
-    "Bring the right buyer, and Shubh Tristar will do the rest.",
-    "Every follow-up call is a brick in your commission tower.",
-    "Top CPs are made one site visit at a time.",
-    "The best time to follow up was yesterday — the next best time is now.",
-    "Champions are built on relentless follow-ups.",
-    "A confident pitch today builds a confirmed booking tomorrow.",
-    "Together, PROP CPs are closer to the next brokerage slab than ever."
+    'Every site visit you bring in moves PROP closer to the next brokerage slab — keep the momentum going!',
+    "Great CPs don't wait for leads, they create them. Today is a great day to close one more.",
+    'The 5% slab is closer than you think — one more booking could tip the scale for everyone.',
+    "Your hustle today is tomorrow's commission. Keep pushing — Shubh Tristar believes in PROP CPs.",
+    'Consistency beats intensity. One quality lead a day adds up to a top performing month.',
+    "Top performers aren't lucky, they're consistent. Log today's visit and stay in the race.",
+    'PROP rewards collective effort — your booking helps every CP unlock a higher slab.',
+    'Confidence sells Skyvillas. Walk every client through the vision, not just the floor plan.',
+    "A follow-up call today could be the booking that pushes PROP over the next milestone.",
+    'Excellence is a habit. Show up, follow up, and close — that is the PROP CP way.'
   ];
 
   /* ---------- DOM refs ---------- */
@@ -69,24 +69,30 @@
   var statBookings = $('statBookings');
   var statSales = $('statSales');
   var statCommission = $('statCommission');
-  var homeCumValue = $('homeCumValue');
-  var homeCumBadge = $('homeCumBadge');
-  var homeCumFill = $('homeCumFill');
-  var homeTick35 = $('homeTick35');
-  var homeTick50 = $('homeTick50');
-  var motivationText = $('motivationText');
-  var targetDonut = $('targetDonut');
+
+  var donutLabel = $('donutLabel');
+  var donutProgressCircle = $('donutProgressCircle');
   var donutPct = $('donutPct');
+  var donutSub = $('donutSub');
+  var donutSlabBadge = $('donutSlabBadge');
+  var donutFlats = $('donutFlats');
+
+  var motivationText = $('motivationText');
   var latestBookingCP = $('latestBookingCP');
   var latestBookingMeta = $('latestBookingMeta');
   var topCpList = $('topCpList');
-  var pubStatLeads = $('pubStatLeads');
-  var pubStatBookings = $('pubStatBookings');
-  var pubStatFlats = $('pubStatFlats');
-  var pubStatConversion = $('pubStatConversion');
-  var statusBreakdown = $('statusBreakdown');
-  var configBreakdown = $('configBreakdown');
+
+  var basicStatLeads = $('basicStatLeads');
+  var basicStatBookings = $('basicStatBookings');
+  var basicStatFlats = $('basicStatFlats');
+  var basicStatCPs = $('basicStatCPs');
+
   var exportExcelBtn = $('exportExcelBtn');
+  var statusBreakdownEl = $('statusBreakdown');
+  var configBreakdownEl = $('configBreakdown');
+  var conversionRateEl = $('conversionRate');
+  var activeCpCountEl = $('activeCpCount');
+  var avgLeadsPerCpEl = $('avgLeadsPerCp');
 
   /* ---------- State ---------- */
   var leads = [];
@@ -94,8 +100,8 @@
   /* ---------- Seed data (used only on first run) ---------- */
   function seedData() {
     return [
-      { id: 'L1001', name: 'Aarav Mehta', phone: '9820012345', config: '4 BHK Skyvilla', cpName: 'Prestige Realty Partners', visitDate: '2026-05-12T11:00', status: 'Booked', saleValue: 22, bookedAt: '2026-06-15T09:30:00' },
-      { id: 'L1002', name: 'Ishita Rao', phone: '9876543210', config: '3 BHK Skyvilla', cpName: 'Elite Property Consultants', visitDate: '2026-05-18T16:30', status: 'Booked', saleValue: 18, bookedAt: '2026-06-10T14:00:00' },
+      { id: 'L1001', name: 'Aarav Mehta', phone: '9820012345', config: '4 BHK Skyvilla', cpName: 'Prestige Realty Partners', visitDate: '2026-05-12T11:00', status: 'Booked', saleValue: 22, bookedAt: '2026-06-05T10:00' },
+      { id: 'L1002', name: 'Ishita Rao', phone: '9876543210', config: '3 BHK Skyvilla', cpName: 'Elite Property Consultants', visitDate: '2026-05-18T16:30', status: 'Booked', saleValue: 18, bookedAt: '2026-06-15T11:30' },
       { id: 'L1003', name: 'Karan Shah', phone: '9988776655', config: '4 BHK Skyvilla', cpName: 'Prestige Realty Partners', visitDate: '2026-06-02T10:00', status: 'Visit Conducted', saleValue: null, bookedAt: null },
       { id: 'L1004', name: 'Meera Iyer', phone: '9123456780', config: '3 BHK Skyvilla', cpName: 'Skyline Associates', visitDate: '2026-06-08T15:00', status: 'Follow-up', saleValue: null, bookedAt: null }
     ];
@@ -163,8 +169,25 @@
     }, 0);
   }
 
-  function getBookedLeads() {
-    return leads.filter(function (l) { return l.status === 'Booked'; });
+  function getFlatsSold() {
+    return leads.filter(function (l) { return l.status === 'Booked'; }).length;
+  }
+
+  // Donut / target-tracker state: target starts at ₹35 Cr (17 flats);
+  // once crossed, the SAME chart re-targets to ₹50 Cr (24 flats).
+  function getProgressState() {
+    var total = getPropTotalSales();
+    var flatsSold = getFlatsSold();
+    var target, targetFlats, label, tier;
+    if (total >= SLAB2_THRESHOLD) {
+      target = SLAB2_THRESHOLD; targetFlats = FLATS_TARGET_2; label = 'Both PROP Slabs Achieved!'; tier = 2;
+    } else if (total >= SLAB1_THRESHOLD) {
+      target = SLAB2_THRESHOLD; targetFlats = FLATS_TARGET_2; label = 'Chasing the 5% Slab'; tier = 1;
+    } else {
+      target = SLAB1_THRESHOLD; targetFlats = FLATS_TARGET_1; label = 'Chasing the 4% Slab'; tier = 0;
+    }
+    var pct = target > 0 ? Math.min(100, (total / target) * 100) : 0;
+    return { total: total, flatsSold: flatsSold, target: target, targetFlats: targetFlats, label: label, tier: tier, pct: pct };
   }
 
   // Per-CP stats: each CP's own leads/bookings/sales, with commission
@@ -187,92 +210,106 @@
     }).sort(function (a, b) { return b.totalSales - a.totalSales; });
   }
 
-  function getStatusBreakdown() {
-    return STATUS_OPTIONS.map(function (status) {
-      var count = leads.filter(function (l) { return l.status === status; }).length;
-      var pct = leads.length ? (count / leads.length) * 100 : 0;
-      return { status: status, count: count, pct: pct };
-    });
+  function getLatestBooking() {
+    var booked = leads.filter(function (l) { return l.status === 'Booked' && l.bookedAt; });
+    if (booked.length === 0) return null;
+    booked.sort(function (a, b) { return new Date(b.bookedAt) - new Date(a.bookedAt); });
+    return booked[0];
   }
 
-  function getConfigBreakdown() {
-    return CONFIG_OPTIONS.map(function (config) {
-      var configLeads = leads.filter(function (l) { return l.config === config; });
-      var booked = configLeads.filter(function (l) { return l.status === 'Booked'; });
-      var revenue = booked.reduce(function (s, l) { return s + (Number(l.saleValue) || 0); }, 0);
-      return { config: config, leadsCount: configLeads.length, bookedCount: booked.length, revenue: revenue };
-    });
+  function getTodaysMotivation() {
+    var start = new Date(new Date().getFullYear(), 0, 0);
+    var dayOfYear = Math.floor((new Date() - start) / 86400000);
+    return MOTIVATION_QUOTES[dayOfYear % MOTIVATION_QUOTES.length];
   }
 
-  /* ---------- Rendering: Daily motivation ---------- */
-  function renderMotivation() {
-    var dayIndex = Math.floor(Date.now() / 86400000);
-    motivationText.textContent = MOTIVATION_QUOTES[dayIndex % MOTIVATION_QUOTES.length];
-  }
-
-  /* ---------- Rendering: Public home — cumulative PROP sales ---------- */
-  function renderHomeCumulative() {
-    var total = getPropTotalSales();
-    var slab = getSlab(total);
-    var scaleMax = Math.max(SLAB2_THRESHOLD * 1.2, total * 1.05, 1);
-
-    homeCumValue.textContent = formatCr(total);
-    homeCumBadge.textContent = slab.label;
-    homeCumBadge.className = 'slab-badge slab-badge--' + slab.tier;
-    homeCumFill.style.width = Math.min(100, (total / scaleMax) * 100) + '%';
-    homeTick35.style.left = (SLAB1_THRESHOLD / scaleMax) * 100 + '%';
-    homeTick50.style.left = (SLAB2_THRESHOLD / scaleMax) * 100 + '%';
-    homeTick35.innerHTML = '<span class="tick-label">' + SLAB1_FLATS + ' Flats<br>(&#8377;' + SLAB1_THRESHOLD + ' Cr)</span>';
-    homeTick50.innerHTML = '<span class="tick-label">' + SLAB2_FLATS + ' Flats<br>(&#8377;' + SLAB2_THRESHOLD + ' Cr)</span>';
-  }
-
-  /* ---------- Rendering: Target-completion donut ---------- */
+  /* ---------- Rendering: Donut target chart ---------- */
   function renderDonut() {
-    var total = getPropTotalSales();
-    var pct = Math.min(100, (total / SLAB2_THRESHOLD) * 100);
-    targetDonut.style.background = 'conic-gradient(var(--gold) 0% ' + pct + '%, var(--gray-100) ' + pct + '% 100%)';
-    donutPct.textContent = pct.toFixed(0) + '%';
+    var p = getProgressState();
+    var slab = getSlab(p.total);
+    var offset = DONUT_CIRC - (p.pct / 100) * DONUT_CIRC;
+
+    donutProgressCircle.style.strokeDasharray = DONUT_CIRC;
+    donutProgressCircle.style.strokeDashoffset = offset;
+    donutPct.textContent = Math.round(p.pct) + '%';
+    donutSub.textContent = formatCr(p.total) + ' of ' + formatCr(p.target);
+    donutLabel.textContent = p.label;
+    donutSlabBadge.textContent = slab.label;
+    donutSlabBadge.className = 'slab-badge slab-badge--' + slab.tier;
+    donutFlats.textContent = p.flatsSold + ' of ' + p.targetFlats + ' Flats Sold';
+  }
+
+  /* ---------- Rendering: Motivation ---------- */
+  function renderMotivation() {
+    motivationText.textContent = getTodaysMotivation();
   }
 
   /* ---------- Rendering: Highlights (latest booking + top CPs) ---------- */
   function renderHighlights() {
-    var booked = getBookedLeads().filter(function (l) { return l.bookedAt; });
-    booked.sort(function (a, b) { return new Date(b.bookedAt) - new Date(a.bookedAt); });
-
-    if (booked.length) {
-      var latest = booked[0];
+    var latest = getLatestBooking();
+    if (latest) {
       latestBookingCP.textContent = latest.cpName;
-      latestBookingMeta.textContent = latest.config + ' \u00B7 Booked on ' + formatDate(latest.bookedAt);
+      latestBookingMeta.textContent = latest.config + ' \u00B7 Booked ' + formatDate(latest.bookedAt);
     } else {
-      latestBookingCP.textContent = '\u2014';
-      latestBookingMeta.textContent = 'No bookings yet — be the first PROP CP to close a deal!';
+      latestBookingCP.textContent = 'No bookings yet';
+      latestBookingMeta.textContent = 'Be the first PROP CP to close a deal!';
     }
 
-    var topCps = getCPStats().filter(function (cp) { return cp.totalSales > 0; }).slice(0, 3);
-    topCpList.innerHTML = '';
-    if (topCps.length === 0) {
-      topCpList.innerHTML = '<p class="empty-state">No bookings recorded yet.</p>';
+    var top = getCPStats().filter(function (cp) { return cp.totalSales > 0; }).slice(0, 3);
+    if (top.length === 0) {
+      topCpList.innerHTML = '<p class="empty-state">No bookings recorded yet. Be the first to top the board!</p>';
       return;
     }
-    topCps.forEach(function (cp, idx) {
-      var rank = idx + 1;
-      var li = document.createElement('li');
-      li.className = 'top-cp-item';
-      li.innerHTML =
-        '<span class="rank-badge rank-badge--' + rank + '">' + rank + '</span>' +
-        '<div class="top-cp-info"><strong>' + escapeHtml(cp.name) + '</strong>' +
-        '<span>' + formatCr(cp.totalSales) + ' \u00B7 ' + cp.bookings + ' booking(s)</span></div>';
-      topCpList.appendChild(li);
-    });
+    var medals = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49'];
+    topCpList.innerHTML = top.map(function (cp, i) {
+      return '<div class="top-cp-row"><div><span class="top-cp-rank">' + medals[i] + '</span>' +
+        '<span class="top-cp-name">' + escapeHtml(cp.name) + '</span></div>' +
+        '<span class="top-cp-value">' + formatCr(cp.totalSales) + '</span></div>';
+    }).join('');
   }
 
-  /* ---------- Rendering: Public basic analytics ---------- */
-  function renderPublicAnalytics() {
-    var bookings = getBookedLeads();
-    pubStatLeads.textContent = leads.length;
-    pubStatBookings.textContent = bookings.length;
-    pubStatFlats.textContent = bookings.length; // each booked lead represents one flat
-    pubStatConversion.textContent = (leads.length ? Math.round((bookings.length / leads.length) * 100) : 0) + '%';
+  /* ---------- Rendering: Basic analytics (public) ---------- */
+  function renderBasicAnalytics() {
+    var p = getProgressState();
+    var cpNames = {};
+    leads.forEach(function (l) { cpNames[l.cpName] = true; });
+
+    basicStatLeads.textContent = leads.length;
+    basicStatBookings.textContent = leads.filter(function (l) { return l.status === 'Booked'; }).length;
+    basicStatFlats.textContent = p.flatsSold;
+    basicStatCPs.textContent = Object.keys(cpNames).length;
+  }
+
+  /* ---------- Rendering: Detailed analytics (admin) ---------- */
+  function renderDetailedAnalytics() {
+    var total = leads.length || 1;
+
+    var statusCounts = {};
+    STATUS_OPTIONS.forEach(function (s) { statusCounts[s] = 0; });
+    leads.forEach(function (l) { statusCounts[l.status] = (statusCounts[l.status] || 0) + 1; });
+    statusBreakdownEl.innerHTML = STATUS_OPTIONS.map(function (s) {
+      var count = statusCounts[s] || 0;
+      var pct = Math.round((count / total) * 100);
+      return '<div class="bar-row"><div class="bar-row-top"><span>' + s + '</span><span>' + count + ' (' + pct + '%)</span></div>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>';
+    }).join('');
+
+    configBreakdownEl.innerHTML = CONFIG_OPTIONS.map(function (c) {
+      var count = leads.filter(function (l) { return l.config === c; }).length;
+      var pct = Math.round((count / total) * 100);
+      return '<div class="bar-row"><div class="bar-row-top"><span>' + c + '</span><span>' + count + ' (' + pct + '%)</span></div>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>';
+    }).join('');
+
+    var bookings = leads.filter(function (l) { return l.status === 'Booked'; }).length;
+    var conversion = leads.length ? Math.round((bookings / leads.length) * 100) : 0;
+    conversionRateEl.textContent = conversion + '%';
+
+    var cpNames = {};
+    leads.forEach(function (l) { cpNames[l.cpName] = true; });
+    var cpCount = Object.keys(cpNames).length;
+    activeCpCountEl.textContent = cpCount;
+    avgLeadsPerCpEl.textContent = cpCount ? (leads.length / cpCount).toFixed(1) : '0';
   }
 
   /* ---------- Rendering: Lead table ---------- */
@@ -280,13 +317,18 @@
     leadTableBody.innerHTML = '';
     leadCountBadge.textContent = leads.length + (leads.length === 1 ? ' lead' : ' leads');
     emptyState.hidden = leads.length !== 0;
+    var latest = getLatestBooking();
 
     leads.slice().reverse().forEach(function (lead) {
       var tr = document.createElement('tr');
       tr.dataset.id = lead.id;
+      var isLatest = !!(latest && latest.id === lead.id);
+      if (isLatest) tr.classList.add('is-latest');
 
       tr.innerHTML =
-        '<td data-label="Customer"><span class="cust-name">' + escapeHtml(lead.name) + '<small>' + escapeHtml(lead.config) + '</small></span></td>' +
+        '<td data-label="Customer"><span class="cust-name">' + escapeHtml(lead.name) +
+          (isLatest ? '<span class="latest-tag">Latest Booking</span>' : '') +
+          '<small>' + escapeHtml(lead.config) + '</small></span></td>' +
         '<td data-label="Phone">' + escapeHtml(lead.phone) + '</td>' +
         '<td data-label="Configuration">' + escapeHtml(lead.config) + '</td>' +
         '<td data-label="PROP CP">' + escapeHtml(lead.cpName) + '</td>' +
@@ -294,7 +336,6 @@
         '<td data-label="Status"></td>' +
         '<td data-label="Sale Value (Cr)"></td>';
 
-      // Status select
       var statusCell = tr.children[5];
       var select = document.createElement('select');
       select.className = 'status-select';
@@ -307,7 +348,6 @@
       });
       statusCell.appendChild(select);
 
-      // Sale value input
       var saleCell = tr.children[6];
       var saleInput = document.createElement('input');
       saleInput.type = 'number';
@@ -323,9 +363,9 @@
     });
   }
 
-  /* ---------- Rendering: Stats ---------- */
+  /* ---------- Rendering: Stats (admin) ---------- */
   function renderStats() {
-    var bookings = getBookedLeads();
+    var bookings = leads.filter(function (l) { return l.status === 'Booked'; });
     var totalSales = getPropTotalSales();
     var propSlab = getSlab(totalSales);
     var totalCommission = +(totalSales * propSlab.rate).toFixed(2);
@@ -336,7 +376,7 @@
     statCommission.textContent = formatCr(totalCommission);
   }
 
-  /* ---------- Rendering: Leaderboard ---------- */
+  /* ---------- Rendering: Leaderboard (admin) ---------- */
   function renderLeaderboard() {
     var totalPropSales = getPropTotalSales();
     var propSlab = getSlab(totalPropSales);
@@ -346,7 +386,6 @@
     leaderboardSlabBadge.className = 'slab-badge slab-badge--' + propSlab.tier;
 
     leaderboardGrid.innerHTML = '';
-
     if (cpStats.length === 0) {
       leaderboardGrid.innerHTML = '<p class="empty-state">No PROP CPs tracked yet.</p>';
       return;
@@ -354,7 +393,6 @@
 
     cpStats.forEach(function (cp) {
       var sharePct = totalPropSales > 0 ? Math.min(100, (cp.totalSales / totalPropSales) * 100) : 0;
-
       var card = document.createElement('div');
       card.className = 'cp-card';
       card.innerHTML =
@@ -362,7 +400,7 @@
           '<div><div class="cp-name">' + escapeHtml(cp.name) + '</div>' +
           '<div class="cp-leads-count">' + cp.totalLeads + ' lead(s) &middot; ' + cp.bookings + ' booking(s)</div></div>' +
         '</div>' +
-        '<div class="slab-meter-wrap" style="margin-bottom:6px">' +
+        '<div class="slab-meter-wrap">' +
           '<div class="slab-meter"><div class="slab-meter-fill" style="width:' + sharePct + '%"></div></div>' +
           '<p class="share-label">' + sharePct.toFixed(0) + '% of total PROP sales contributed</p>' +
         '</div>' +
@@ -374,36 +412,10 @@
     });
   }
 
-  /* ---------- Rendering: Detailed analytics (admin) ---------- */
-  function renderDetailedAnalytics() {
-    statusBreakdown.innerHTML = '';
-    getStatusBreakdown().forEach(function (row) {
-      var div = document.createElement('div');
-      div.className = 'breakdown-row';
-      div.innerHTML =
-        '<span class="breakdown-label">' + row.status + '</span>' +
-        '<span class="breakdown-bar-track"><span class="breakdown-bar-fill" style="width:' + row.pct + '%"></span></span>' +
-        '<span class="breakdown-count">' + row.count + '</span>';
-      statusBreakdown.appendChild(div);
-    });
-
-    configBreakdown.innerHTML = '';
-    getConfigBreakdown().forEach(function (row) {
-      var div = document.createElement('div');
-      div.className = 'config-row';
-      div.innerHTML =
-        '<span><strong>' + row.config + '</strong>' + row.leadsCount + ' lead(s)</span>' +
-        '<span><strong>Booked</strong>' + row.bookedCount + '</span>' +
-        '<span><strong>Revenue</strong>' + formatCr(row.revenue) + '</span>';
-      configBreakdown.appendChild(div);
-    });
-  }
-
   function renderAll() {
-    renderHomeCumulative();
     renderDonut();
     renderHighlights();
-    renderPublicAnalytics();
+    renderBasicAnalytics();
     renderLeadTable();
     renderStats();
     renderLeaderboard();
@@ -443,50 +455,55 @@
   }
   function closeLoginModal() { loginModal.hidden = true; }
 
-  /* ---------- Excel export (Admin Console only) ---------- */
+  /* ---------- Excel export (admin only) ---------- */
   function exportToExcel() {
     if (typeof XLSX === 'undefined') {
-      showToast('Excel library failed to load — check your internet connection.');
+      showToast('Export library failed to load. Check your internet connection and try again.');
       return;
     }
-    var leadsSheet = leads.map(function (l) {
+
+    var leadRows = leads.map(function (l) {
       return {
         'Customer Name': l.name,
-        'Phone Number': l.phone,
+        'Phone': l.phone,
         'Configuration': l.config,
-        'PROP CP Name': l.cpName,
+        'PROP CP': l.cpName,
         'Visit Date': formatDate(l.visitDate),
-        'Visit Status': l.status,
+        'Status': l.status,
         'Sale Value (Cr)': l.saleValue || '',
         'Booked On': l.bookedAt ? formatDate(l.bookedAt) : ''
       };
     });
 
-    var propSlab = getSlab(getPropTotalSales());
-    var cpSheet = getCPStats().map(function (cp) {
+    var totalPropSales = getPropTotalSales();
+    var cpStats = getCPStats();
+    var cpRows = cpStats.map(function (cp) {
       return {
         'PROP CP Name': cp.name,
         'Total Leads': cp.totalLeads,
         'Bookings': cp.bookings,
-        'Total Sales (Cr)': cp.totalSales,
-        'Active PROP Slab': propSlab.label,
+        'Own Sales (Cr)': cp.totalSales,
+        'Share of PROP Sales (%)': totalPropSales ? +((cp.totalSales / totalPropSales) * 100).toFixed(1) : 0,
         'Commission Earned (Cr)': cp.commission
       };
     });
 
-    var summarySheet = [{
-      'Cumulative PROP Sales (Cr)': getPropTotalSales(),
-      'Active PROP Slab': propSlab.label,
-      'Total Leads': leads.length,
-      'Total Bookings': getBookedLeads().length,
-      'Total Commission Payable (Cr)': +(getPropTotalSales() * propSlab.rate).toFixed(2),
-      'Exported On': formatDate(new Date().toISOString())
-    }];
+    var p = getProgressState();
+    var slab = getSlab(totalPropSales);
+    var summaryRows = [
+      { Metric: 'Total Leads', Value: leads.length },
+      { Metric: 'Total Bookings', Value: leads.filter(function (l) { return l.status === 'Booked'; }).length },
+      { Metric: 'Flats Sold', Value: p.flatsSold },
+      { Metric: 'Cumulative PROP Sales (Cr)', Value: totalPropSales },
+      { Metric: 'Active PROP Slab', Value: slab.label },
+      { Metric: 'Total Commission Payable (Cr)', Value: +(totalPropSales * slab.rate).toFixed(2) },
+      { Metric: 'Export Generated On', Value: new Date().toLocaleString('en-IN') }
+    ];
 
     var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summarySheet), 'PROP Summary');
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(leadsSheet), 'Leads');
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(cpSheet), 'CP Leaderboard');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryRows), 'Summary');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(leadRows), 'Leads');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(cpRows), 'CP Leaderboard');
     XLSX.writeFile(wb, 'ShubhTristar_PROP_Export_' + new Date().toISOString().slice(0, 10) + '.xlsx');
     showToast('Excel file exported successfully.');
   }
@@ -521,7 +538,7 @@
     }
   });
 
-  // Lead entry form — now only reachable from inside the Admin Console.
+  // Lead entry form — only reachable from inside the Admin Console.
   leadForm.addEventListener('submit', function (e) {
     e.preventDefault();
     var name = $('custName').value.trim();
@@ -563,7 +580,7 @@
     if (e.target.classList.contains('status-select')) {
       lead.status = e.target.value;
       if (lead.status === 'Booked') {
-        lead.bookedAt = new Date().toISOString();
+        if (!lead.bookedAt) lead.bookedAt = new Date().toISOString();
       } else {
         lead.saleValue = null;
         lead.bookedAt = null;
