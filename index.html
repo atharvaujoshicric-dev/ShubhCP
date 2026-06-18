@@ -29,33 +29,35 @@
   </div>
 </header>
 
-<!-- ================= PUBLIC HOME (PROP CP HUB) ================= -->
+<!-- ================= PUBLIC HOME (single screen, no scroll on desktop) ================= -->
 <main id="publicView" class="view is-active">
+  <div class="home-shell">
 
-  <!-- Hero: offers on the left, live target donut on the right -->
-  <section class="hero">
-    <div class="container hero-grid">
-      <div class="hero-left">
+    <section class="home-top-grid">
+      <div class="hero-left-compact">
         <p class="eyebrow">Shubh Tristar &mdash; Premium Skyvilla Residences</p>
         <h1>PROP Channel Partner Brokerage Program</h1>
-        <p class="hero-sub">Every PROP CP shares in Shubh Tristar's success. Brokerage slabs unlock as the project's total cumulative sales grow &mdash; the reward is for PROP's combined performance, not any single CP.</p>
 
-        <div class="offer-grid">
-          <article class="offer-card">
+        <div class="offer-grid-compact">
+          <article class="offer-card-compact">
             <span class="offer-tag">Slab 01</span>
-            <p class="offer-value">4%<small>Brokerage</small></p>
-            <p class="offer-copy">When PROP's cumulative sale value crosses <strong>&#8377;35 Cr</strong></p>
+            <p class="offer-value-compact">4%<small>Brokerage</small></p>
+            <p class="offer-copy-compact">PROP sales cross <strong>&#8377;35 Cr</strong></p>
           </article>
-          <article class="offer-card offer-card--gold">
+          <article class="offer-card-compact offer-card--gold">
             <span class="offer-tag">Slab 02</span>
-            <p class="offer-value">5%<small>Brokerage</small></p>
-            <p class="offer-copy">When PROP's cumulative sale value crosses <strong>&#8377;50 Cr</strong></p>
+            <p class="offer-value-compact">5%<small>Brokerage</small></p>
+            <p class="offer-copy-compact">PROP sales cross <strong>&#8377;50 Cr</strong></p>
           </article>
         </div>
-        <p class="offer-note">Slabs are calculated on Shubh Tristar's total cumulative PROP sales across all Channel Partners combined &mdash; not on any individual CP's personal sales.</p>
+
+        <div class="motivation-banner-compact">
+          <span class="motivation-icon">&#10022;</span>
+          <p id="motivationText">Loading today's motivation&hellip;</p>
+        </div>
       </div>
 
-      <div class="hero-right">
+      <div class="hero-right-compact">
         <div class="card donut-card">
           <div class="donut-head">
             <span class="eyebrow eyebrow-dark">Target Progress, Live</span>
@@ -78,28 +80,17 @@
             </div>
           </div>
           <div class="donut-footer">
-            <span class="slab-badge slab-badge--0" id="donutSlabBadge">Not Qualified</span>
+            <span class="slab-badge slab-badge--0" id="donutSlabBadge" hidden>Not Qualified</span>
             <span class="donut-flats" id="donutFlats">0 of 17 Flats Sold</span>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Daily motivation banner for PROP CPs -->
-  <section class="container motivation-section">
-    <div class="motivation-banner">
-      <span class="motivation-icon">&#10022;</span>
-      <p id="motivationText">Loading today's motivation&hellip;</p>
-    </div>
-  </section>
-
-  <!-- Latest booking spotlight + top performing CPs -->
-  <section class="container highlights-section">
-    <div class="highlights-grid">
-      <div class="card spotlight-card">
+    <section class="home-mid-row">
+      <div class="card spotlight-card-compact">
         <span class="eyebrow eyebrow-dark">Latest Booking</span>
-        <div class="spotlight-body">
+        <div class="spotlight-body-compact">
           <span class="spotlight-trophy">&#127942;</span>
           <div>
             <p class="spotlight-cp" id="latestBookingCP">&mdash;</p>
@@ -107,42 +98,33 @@
           </div>
         </div>
       </div>
-      <div class="card top-cp-card">
+      <div class="card top-cp-card-compact">
         <span class="eyebrow eyebrow-dark">Top Performing PROP CPs</span>
         <div id="topCpList" class="top-cp-list"></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Basic public analytics -->
-  <section class="container basic-analytics-section">
-    <div class="section-head">
-      <h2>PROP Performance at a Glance</h2>
-      <p>Live numbers from the field, updated as soon as the Admin team logs activity.</p>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-card">
-        <span class="stat-label">Total Site Visits</span>
-        <span class="stat-value" id="basicStatLeads">0</span>
+    <section class="home-bottom-row">
+      <div class="stat-card-compact">
+        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        <span class="stat-card-body"><span class="stat-label">Total Site Visits</span><span class="stat-value" id="basicStatLeads">0</span></span>
       </div>
-      <div class="stat-card">
-        <span class="stat-label">Total Bookings</span>
-        <span class="stat-value" id="basicStatBookings">0</span>
+      <div class="stat-card-compact">
+        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg></span>
+        <span class="stat-card-body"><span class="stat-label">Total Bookings</span><span class="stat-value" id="basicStatBookings">0</span></span>
       </div>
-      <div class="stat-card">
-        <span class="stat-label">Flats Sold</span>
-        <span class="stat-value" id="basicStatFlats">0</span>
+      <div class="stat-card-compact">
+        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2M9 16h2M13 16h2"/></svg></span>
+        <span class="stat-card-body"><span class="stat-label">Flats Sold</span><span class="stat-value" id="basicStatFlats">0</span></span>
       </div>
-      <div class="stat-card stat-card--gold">
-        <span class="stat-label">Active PROP CPs</span>
-        <span class="stat-value" id="basicStatCPs">0</span>
+      <div class="stat-card-compact stat-card--gold">
+        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7.5 7.5L11 16M16.5 7.5L13 16M8 6h8"/></svg></span>
+        <span class="stat-card-body"><span class="stat-label">Active PROP CPs</span><span class="stat-value" id="basicStatCPs">0</span></span>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <footer class="footer">
-    <div class="container">&copy; <span id="year"></span> Shubh Tristar. PROP Channel Partner Hub &mdash; Internal Use Only.</div>
-  </footer>
+  <footer class="footer-compact">&copy; <span id="year"></span> Shubh Tristar. PROP Channel Partner Hub &mdash; Internal Use Only.</footer>
 </main>
 
 <!-- ================= ADMIN CONSOLE ================= -->
@@ -158,20 +140,20 @@
 
     <div class="stat-grid">
       <div class="stat-card">
-        <span class="stat-label">Total Leads</span>
-        <span class="stat-value" id="statLeads">0</span>
+        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></span>
+        <span class="stat-card-body"><span class="stat-label">Total Leads</span><span class="stat-value" id="statLeads">0</span></span>
       </div>
       <div class="stat-card">
-        <span class="stat-label">Total Bookings</span>
-        <span class="stat-value" id="statBookings">0</span>
+        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg></span>
+        <span class="stat-card-body"><span class="stat-label">Total Bookings</span><span class="stat-value" id="statBookings">0</span></span>
       </div>
       <div class="stat-card">
-        <span class="stat-label">Cumulative PROP Sales</span>
-        <span class="stat-value" id="statSales">&#8377;0 Cr</span>
+        <span class="stat-icon stat-icon--glyph">&#8377;</span>
+        <span class="stat-card-body"><span class="stat-label">Cumulative PROP Sales</span><span class="stat-value" id="statSales">&#8377;0 Cr</span></span>
       </div>
       <div class="stat-card stat-card--gold">
-        <span class="stat-label">PROP Commission Payable</span>
-        <span class="stat-value" id="statCommission">&#8377;0 Cr</span>
+        <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h15a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7l2-3h9l2 3"/><circle cx="16" cy="12" r="1.5"/></svg></span>
+        <span class="stat-card-body"><span class="stat-label">PROP Commission Payable</span><span class="stat-value" id="statCommission">&#8377;0 Cr</span></span>
       </div>
     </div>
 
@@ -189,12 +171,33 @@
           <div id="configBreakdown" class="bar-list"></div>
         </div>
         <div class="analytics-block">
+          <h4>Revenue by Configuration</h4>
+          <div id="revenueByConfig" class="bar-list"></div>
+        </div>
+        <div class="analytics-block">
           <h4>Conversion Snapshot</h4>
           <div class="mini-stats">
             <div><span>Conversion Rate</span><strong id="conversionRate">0%</strong></div>
             <div><span>Active PROP CPs</span><strong id="activeCpCount">0</strong></div>
             <div><span>Avg. Leads / CP</span><strong id="avgLeadsPerCp">0</strong></div>
           </div>
+        </div>
+      </div>
+
+      <div class="analytics-subpanel">
+        <h4>Lead Status Funnel</h4>
+        <div id="leadFunnel"></div>
+      </div>
+
+      <div class="analytics-subpanel">
+        <h4>PROP CP Performance Ranking</h4>
+        <div class="table-wrap">
+          <table class="ranking-table">
+            <thead>
+              <tr><th>Rank</th><th>PROP CP</th><th>Leads</th><th>Bookings</th><th>Conversion</th><th>Sales (Cr)</th></tr>
+            </thead>
+            <tbody id="cpRankingBody"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -217,7 +220,8 @@
             <label for="config">Selected Configuration</label>
             <select id="config" name="config" required>
               <option value="" disabled selected>Choose configuration</option>
-              <option value="3 BHK Skyvilla">3 BHK Skyvilla</option>
+              <option value="3 BHK Skyvilla (1268 sq.ft)">3 BHK Skyvilla (1268 sq.ft)</option>
+              <option value="3 BHK Skyvilla (1298 sq.ft)">3 BHK Skyvilla (1298 sq.ft)</option>
               <option value="4 BHK Skyvilla">4 BHK Skyvilla</option>
             </select>
           </div>
@@ -240,6 +244,17 @@
         <h3>Lead Management</h3>
         <span class="badge" id="leadCount">0 leads</span>
       </div>
+      <div class="table-toolbar">
+        <input id="leadSearch" type="text" placeholder="Search by customer or PROP CP name&hellip;">
+        <select id="statusFilter">
+          <option value="">All Statuses</option>
+          <option value="Visit Scheduled">Visit Scheduled</option>
+          <option value="Visit Conducted">Visit Conducted</option>
+          <option value="Follow-up">Follow-up</option>
+          <option value="Not Interested">Not Interested</option>
+          <option value="Booked">Booked</option>
+        </select>
+      </div>
       <div class="table-wrap">
         <table class="lead-table">
           <thead>
@@ -251,6 +266,7 @@
               <th>Visit Date</th>
               <th>Visit Status</th>
               <th>Sale Value (Cr)</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="leadTableBody"></tbody>

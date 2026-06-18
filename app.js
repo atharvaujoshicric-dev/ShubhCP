@@ -28,7 +28,7 @@
   var FLATS_TARGET_1 = 17;    // flats equivalent to ₹35 Cr
   var FLATS_TARGET_2 = 24;    // flats equivalent to ₹50 Cr
   var STATUS_OPTIONS = ['Visit Scheduled', 'Visit Conducted', 'Follow-up', 'Not Interested', 'Booked'];
-  var CONFIG_OPTIONS = ['3 BHK Skyvilla', '4 BHK Skyvilla'];
+  var CONFIG_OPTIONS = ['3 BHK Skyvilla (1268 sq.ft)', '3 BHK Skyvilla (1298 sq.ft)', '4 BHK Skyvilla'];
   var DONUT_R = 68;
   var DONUT_CIRC = 2 * Math.PI * DONUT_R;
 
@@ -41,7 +41,7 @@
     "Top performers aren't lucky, they're consistent. Log today's visit and stay in the race.",
     'PROP rewards collective effort — your booking helps every CP unlock a higher slab.',
     'Confidence sells Skyvillas. Walk every client through the vision, not just the floor plan.',
-    "A follow-up call today could be the booking that pushes PROP over the next milestone.",
+    'A follow-up call today could be the booking that pushes PROP over the next milestone.',
     'Excellence is a habit. Show up, follow up, and close — that is the PROP CP way.'
   ];
 
@@ -90,9 +90,15 @@
   var exportExcelBtn = $('exportExcelBtn');
   var statusBreakdownEl = $('statusBreakdown');
   var configBreakdownEl = $('configBreakdown');
+  var revenueByConfigEl = $('revenueByConfig');
   var conversionRateEl = $('conversionRate');
   var activeCpCountEl = $('activeCpCount');
   var avgLeadsPerCpEl = $('avgLeadsPerCp');
+  var leadFunnelEl = $('leadFunnel');
+  var cpRankingBodyEl = $('cpRankingBody');
+
+  var leadSearchEl = $('leadSearch');
+  var statusFilterEl = $('statusFilter');
 
   /* ---------- State ---------- */
   var leads = [];
@@ -101,9 +107,9 @@
   function seedData() {
     return [
       { id: 'L1001', name: 'Aarav Mehta', phone: '9820012345', config: '4 BHK Skyvilla', cpName: 'Prestige Realty Partners', visitDate: '2026-05-12T11:00', status: 'Booked', saleValue: 22, bookedAt: '2026-06-05T10:00' },
-      { id: 'L1002', name: 'Ishita Rao', phone: '9876543210', config: '3 BHK Skyvilla', cpName: 'Elite Property Consultants', visitDate: '2026-05-18T16:30', status: 'Booked', saleValue: 18, bookedAt: '2026-06-15T11:30' },
+      { id: 'L1002', name: 'Ishita Rao', phone: '9876543210', config: '3 BHK Skyvilla (1298 sq.ft)', cpName: 'Elite Property Consultants', visitDate: '2026-05-18T16:30', status: 'Booked', saleValue: 18, bookedAt: '2026-06-15T11:30' },
       { id: 'L1003', name: 'Karan Shah', phone: '9988776655', config: '4 BHK Skyvilla', cpName: 'Prestige Realty Partners', visitDate: '2026-06-02T10:00', status: 'Visit Conducted', saleValue: null, bookedAt: null },
-      { id: 'L1004', name: 'Meera Iyer', phone: '9123456780', config: '3 BHK Skyvilla', cpName: 'Skyline Associates', visitDate: '2026-06-08T15:00', status: 'Follow-up', saleValue: null, bookedAt: null }
+      { id: 'L1004', name: 'Meera Iyer', phone: '9123456780', config: '3 BHK Skyvilla (1268 sq.ft)', cpName: 'Skyline Associates', visitDate: '2026-06-08T15:00', status: 'Follow-up', saleValue: null, bookedAt: null }
     ];
   }
 
@@ -192,20 +198,29 @@
 
   // Per-CP stats: each CP's own leads/bookings/sales, with commission
   // computed using the single PROP-wide slab rate (not a per-CP slab).
+  //
+  // BUG FIX: `bookings` now increments for every status === 'Booked' lead,
+  // regardless of whether a sale value has been entered yet. Previously it
+  // only counted when saleValue was truthy, which made a freshly-booked
+  // lead (awaiting sale-value entry) invisible to the CP leaderboard and
+  // the Top Performing CPs list, while still counting toward "Flats Sold"
+  // and the admin status breakdown — an inconsistency across the app.
+  // Revenue summation is unaffected: unentered sale values still add ₹0.
   function getCPStats() {
     var propSlab = getSlab(getPropTotalSales());
     var map = {};
     leads.forEach(function (l) {
       if (!map[l.cpName]) map[l.cpName] = { name: l.cpName, totalLeads: 0, bookings: 0, totalSales: 0 };
       map[l.cpName].totalLeads += 1;
-      if (l.status === 'Booked' && l.saleValue) {
+      if (l.status === 'Booked') {
         map[l.cpName].bookings += 1;
-        map[l.cpName].totalSales += Number(l.saleValue);
+        map[l.cpName].totalSales += Number(l.saleValue) || 0;
       }
     });
     return Object.keys(map).map(function (k) {
       var cp = map[k];
       cp.commission = +(cp.totalSales * propSlab.rate).toFixed(2);
+      cp.conversion = cp.totalLeads ? Math.round((cp.bookings / cp.totalLeads) * 100) : 0;
       return cp;
     }).sort(function (a, b) { return b.totalSales - a.totalSales; });
   }
@@ -223,6 +238,18 @@
     return MOTIVATION_QUOTES[dayOfYear % MOTIVATION_QUOTES.length];
   }
 
+  // Non-destructive lead filtering for the Admin lead table — never
+  // mutates the underlying `leads` array.
+  function getFilteredLeads() {
+    var term = (leadSearchEl && leadSearchEl.value || '').toLowerCase().trim();
+    var statusVal = statusFilterEl ? statusFilterEl.value : '';
+    return leads.filter(function (l) {
+      var matchesTerm = !term || l.name.toLowerCase().indexOf(term) !== -1 || l.cpName.toLowerCase().indexOf(term) !== -1;
+      var matchesStatus = !statusVal || l.status === statusVal;
+      return matchesTerm && matchesStatus;
+    });
+  }
+
   /* ---------- Rendering: Donut target chart ---------- */
   function renderDonut() {
     var p = getProgressState();
@@ -234,9 +261,19 @@
     donutPct.textContent = Math.round(p.pct) + '%';
     donutSub.textContent = formatCr(p.total) + ' of ' + formatCr(p.target);
     donutLabel.textContent = p.label;
-    donutSlabBadge.textContent = slab.label;
-    donutSlabBadge.className = 'slab-badge slab-badge--' + slab.tier;
     donutFlats.textContent = p.flatsSold + ' of ' + p.targetFlats + ' Flats Sold';
+
+    // "Not Qualified" is intentionally hidden on the public donut — the
+    // badge only appears once a slab is actually unlocked (tier 1 or 2).
+    // It still appears in the Admin leaderboard panel, since that's an
+    // internal view where the literal qualification state is useful.
+    if (slab.tier === 0) {
+      donutSlabBadge.hidden = true;
+    } else {
+      donutSlabBadge.hidden = false;
+      donutSlabBadge.textContent = slab.label;
+      donutSlabBadge.className = 'slab-badge slab-badge--' + slab.tier;
+    }
   }
 
   /* ---------- Rendering: Motivation ---------- */
@@ -262,9 +299,11 @@
     }
     var medals = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49'];
     topCpList.innerHTML = top.map(function (cp, i) {
-      return '<div class="top-cp-row"><div><span class="top-cp-rank">' + medals[i] + '</span>' +
+      var bookingLabel = cp.bookings + (cp.bookings === 1 ? ' Booking' : ' Bookings');
+      return '<div class="top-cp-row"><div class="top-cp-left"><span class="top-cp-rank">' + medals[i] + '</span>' +
         '<span class="top-cp-name">' + escapeHtml(cp.name) + '</span></div>' +
-        '<span class="top-cp-value">' + formatCr(cp.totalSales) + '</span></div>';
+        '<div class="top-cp-right"><span class="top-cp-value">' + formatCr(cp.totalSales) + '</span>' +
+        '<span class="top-cp-bookings">' + bookingLabel + '</span></div></div>';
     }).join('');
   }
 
@@ -281,26 +320,42 @@
   }
 
   /* ---------- Rendering: Detailed analytics (admin) ---------- */
+  function barRow(label, rightText, pct) {
+    return '<div class="bar-row"><div class="bar-row-top"><span>' + label + '</span><span>' + rightText + '</span></div>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>';
+  }
+
   function renderDetailedAnalytics() {
     var total = leads.length || 1;
 
+    // Visit status breakdown
     var statusCounts = {};
     STATUS_OPTIONS.forEach(function (s) { statusCounts[s] = 0; });
     leads.forEach(function (l) { statusCounts[l.status] = (statusCounts[l.status] || 0) + 1; });
     statusBreakdownEl.innerHTML = STATUS_OPTIONS.map(function (s) {
       var count = statusCounts[s] || 0;
       var pct = Math.round((count / total) * 100);
-      return '<div class="bar-row"><div class="bar-row-top"><span>' + s + '</span><span>' + count + ' (' + pct + '%)</span></div>' +
-        '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>';
+      return barRow(s, count + ' (' + pct + '%)', pct);
     }).join('');
 
+    // Configuration split
     configBreakdownEl.innerHTML = CONFIG_OPTIONS.map(function (c) {
       var count = leads.filter(function (l) { return l.config === c; }).length;
       var pct = Math.round((count / total) * 100);
-      return '<div class="bar-row"><div class="bar-row-top"><span>' + c + '</span><span>' + count + ' (' + pct + '%)</span></div>' +
-        '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>';
+      return barRow(c, count + ' (' + pct + '%)', pct);
     }).join('');
 
+    // Revenue by configuration (aggregate Cr only — never a per-unit price)
+    var revByConfig = CONFIG_OPTIONS.map(function (c) {
+      return { config: c, revenue: leads.filter(function (l) { return l.config === c && l.status === 'Booked'; }).reduce(function (s, l) { return s + (Number(l.saleValue) || 0); }, 0) };
+    });
+    var maxRev = Math.max.apply(null, revByConfig.map(function (r) { return r.revenue; }).concat([1]));
+    revenueByConfigEl.innerHTML = revByConfig.map(function (r) {
+      var pct = Math.round((r.revenue / maxRev) * 100);
+      return barRow(r.config, formatCr(r.revenue), pct);
+    }).join('');
+
+    // Conversion snapshot
     var bookings = leads.filter(function (l) { return l.status === 'Booked'; }).length;
     var conversion = leads.length ? Math.round((bookings / leads.length) * 100) : 0;
     conversionRateEl.textContent = conversion + '%';
@@ -310,16 +365,52 @@
     var cpCount = Object.keys(cpNames).length;
     activeCpCountEl.textContent = cpCount;
     avgLeadsPerCpEl.textContent = cpCount ? (leads.length / cpCount).toFixed(1) : '0';
+
+    // Lead status funnel: Total Leads -> Visited -> Booked
+    var totalLeads = leads.length;
+    var visited = leads.filter(function (l) { return l.status !== 'Visit Scheduled'; }).length;
+    var booked = bookings;
+    var r1 = totalLeads ? Math.round((visited / totalLeads) * 100) : 0;
+    var r2 = visited ? Math.round((booked / visited) * 100) : 0;
+    leadFunnelEl.innerHTML =
+      '<div class="funnel-row">' +
+        '<div class="funnel-step"><strong>' + totalLeads + '</strong><span>Total Leads</span></div>' +
+        '<div class="funnel-arrow">&#8594;<small>' + r1 + '%</small></div>' +
+        '<div class="funnel-step"><strong>' + visited + '</strong><span>Visited</span></div>' +
+        '<div class="funnel-arrow">&#8594;<small>' + r2 + '%</small></div>' +
+        '<div class="funnel-step funnel-step--gold"><strong>' + booked + '</strong><span>Booked</span></div>' +
+      '</div>';
+
+    // PROP CP performance ranking table
+    var cpStats = getCPStats();
+    if (cpStats.length === 0) {
+      cpRankingBodyEl.innerHTML = '<tr><td colspan="6" class="empty-state">No PROP CPs tracked yet.</td></tr>';
+    } else {
+      cpRankingBodyEl.innerHTML = cpStats.map(function (cp, i) {
+        return '<tr><td>' + (i + 1) + '</td><td>' + escapeHtml(cp.name) + '</td><td>' + cp.totalLeads + '</td>' +
+          '<td>' + cp.bookings + '</td><td>' + cp.conversion + '%</td><td>' + formatCr(cp.totalSales) + '</td></tr>';
+      }).join('');
+    }
   }
 
   /* ---------- Rendering: Lead table ---------- */
   function renderLeadTable() {
+    var filtered = getFilteredLeads();
     leadTableBody.innerHTML = '';
-    leadCountBadge.textContent = leads.length + (leads.length === 1 ? ' lead' : ' leads');
-    emptyState.hidden = leads.length !== 0;
+
+    var isFiltered = filtered.length !== leads.length;
+    leadCountBadge.textContent = isFiltered
+      ? filtered.length + ' of ' + leads.length + ' leads'
+      : leads.length + (leads.length === 1 ? ' lead' : ' leads');
+
+    emptyState.hidden = filtered.length !== 0;
+    emptyState.textContent = leads.length === 0
+      ? 'No leads yet. Use the form above to register a PROP CP site visit.'
+      : 'No leads match your search or filter.';
+
     var latest = getLatestBooking();
 
-    leads.slice().reverse().forEach(function (lead) {
+    filtered.slice().reverse().forEach(function (lead) {
       var tr = document.createElement('tr');
       tr.dataset.id = lead.id;
       var isLatest = !!(latest && latest.id === lead.id);
@@ -334,7 +425,8 @@
         '<td data-label="PROP CP">' + escapeHtml(lead.cpName) + '</td>' +
         '<td data-label="Visit Date">' + formatDate(lead.visitDate) + '</td>' +
         '<td data-label="Status"></td>' +
-        '<td data-label="Sale Value (Cr)"></td>';
+        '<td data-label="Sale Value (Cr)"></td>' +
+        '<td data-label="Actions"><button type="button" class="delete-btn" title="Delete lead">&#128465;</button></td>';
 
       var statusCell = tr.children[5];
       var select = document.createElement('select');
@@ -482,6 +574,7 @@
         'PROP CP Name': cp.name,
         'Total Leads': cp.totalLeads,
         'Bookings': cp.bookings,
+        'Conversion (%)': cp.conversion,
         'Own Sales (Cr)': cp.totalSales,
         'Share of PROP Sales (%)': totalPropSales ? +((cp.totalSales / totalPropSales) * 100).toFixed(1) : 0,
         'Commission Earned (Cr)': cp.commission
@@ -515,6 +608,9 @@
   closeLoginBtn.addEventListener('click', closeLoginModal);
   loginModal.addEventListener('click', function (e) { if (e.target === loginModal) closeLoginModal(); });
   exportExcelBtn.addEventListener('click', exportToExcel);
+
+  if (leadSearchEl) leadSearchEl.addEventListener('input', renderLeadTable);
+  if (statusFilterEl) statusFilterEl.addEventListener('change', renderLeadTable);
 
   logoutBtn.addEventListener('click', function () {
     sessionStorage.removeItem(SESSION_KEY);
@@ -570,7 +666,7 @@
     renderAll();
   });
 
-  /* Delegated events for the lead table (status + sale value) */
+  /* Delegated change events for the lead table (status + sale value) */
   leadTableBody.addEventListener('change', function (e) {
     var tr = e.target.closest('tr');
     if (!tr) return;
@@ -603,6 +699,21 @@
       renderAll();
       showToast('Sale value of ' + formatCr(val) + ' recorded for ' + lead.name + '.');
     }
+  });
+
+  /* Delegated click events for the lead table (delete) */
+  leadTableBody.addEventListener('click', function (e) {
+    var btn = e.target.closest('.delete-btn');
+    if (!btn) return;
+    var tr = btn.closest('tr');
+    var lead = leads.find(function (l) { return l.id === tr.dataset.id; });
+    if (!lead) return;
+    var ok = window.confirm('Delete the lead for ' + lead.name + ' (' + lead.cpName + ')? This cannot be undone.');
+    if (!ok) return;
+    leads = leads.filter(function (l) { return l.id !== lead.id; });
+    saveLeads();
+    renderAll();
+    showToast('Lead deleted.');
   });
 
   /* ---------- Init ---------- */
